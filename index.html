@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#10110e" />
+  <meta name="description" content="Poknik Hub — pusat ilmu, program, komuniti dan produk digital Poknik. Concept prototype." />
+  <title>Poknik Hub — Ilmu, Program & Komuniti</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:#10110e; --paper:#f4f1e8; --paper2:#ebe7da; --card:#fffdf8;
+      --lime:#c7ff4a; --lime2:#e5ffad; --muted:#6d7067; --line:rgba(16,17,14,.12);
+      --shadow:0 18px 60px rgba(16,17,14,.10); --radius:26px; --radius2:18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif}
+    a{color:inherit;text-decoration:none}
+    button,input{font:inherit}
+    .wrap{width:min(1180px,calc(100% - 36px));margin:auto}
+    .announcement{background:var(--ink);color:white;text-align:center;padding:10px 18px;font-size:13px;letter-spacing:.02em}
+    .announcement b{color:var(--lime)}
+    header{position:sticky;top:0;z-index:30;background:rgba(244,241,232,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+    nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{font-family:"Manrope";font-weight:800;letter-spacing:-.04em;font-size:22px;display:flex;align-items:center;gap:10px}
+    .brandmark{width:34px;height:34px;border-radius:11px;background:var(--ink);color:var(--lime);display:grid;place-items:center;font-weight:800}
+    .navlinks{display:flex;gap:24px;font-size:14px;font-weight:600;color:#42443f}
+    .navcta,.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:none;cursor:pointer;border-radius:999px;font-weight:700;transition:.2s ease}
+    .navcta{background:var(--ink);color:white;padding:12px 18px;font-size:14px}
+    .navcta:hover,.btn-dark:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(16,17,14,.18)}
+    .hero{padding:74px 0 34px;overflow:hidden}
+    .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.45);font-size:13px;font-weight:700}
+    .dot{width:8px;height:8px;border-radius:50%;background:#7ccc20;box-shadow:0 0 0 5px rgba(124,204,32,.13)}
+    h1{font-family:"Manrope";font-size:clamp(48px,7vw,92px);line-height:.94;letter-spacing:-.065em;margin:22px 0 24px;max-width:920px}
+    .highlight{position:relative;display:inline-block;z-index:0}
+    .highlight:after{content:"";position:absolute;left:-2%;right:-2%;height:.34em;bottom:.02em;background:var(--lime);z-index:-1;transform:rotate(-1.4deg);border-radius:10px}
+    .lead{font-size:19px;line-height:1.6;color:#565950;max-width:690px}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+    .btn{padding:15px 20px}
+    .btn-dark{background:var(--ink);color:white}
+    .btn-light{background:white;border:1px solid var(--line)}
+    .mini-proof{display:flex;align-items:center;gap:14px;margin-top:28px;font-size:13px;color:var(--muted)}
+    .faces{display:flex}
+    .face{width:34px;height:34px;border-radius:50%;border:2px solid var(--paper);margin-left:-8px;background:linear-gradient(135deg,#ddd7c6,#aaa492)}
+    .face:first-child{margin-left:0}
+    .hero-card{background:var(--ink);border-radius:34px;padding:20px;box-shadow:var(--shadow);transform:rotate(1.2deg);position:relative;isolation:isolate}
+    .hero-card:before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:var(--lime);filter:blur(65px);opacity:.18;right:-20px;top:30px;z-index:-1}
+    .profile-top{display:flex;align-items:center;gap:14px;color:white;padding:8px 4px 18px}
+    .avatar{width:64px;height:64px;border-radius:20px;object-fit:cover;border:2px solid rgba(255,255,255,.25)}
+    .profile-top strong{font-family:"Manrope";font-size:18px}
+    .profile-top span{display:block;color:#b7baaf;font-size:13px;margin-top:4px}
+    .avatar-placeholder{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#e5ffad,#9fc93e);color:#10110e;display:grid;place-items:center;font:800 24px "Manrope";border:2px solid rgba(255,255,255,.25)}
+    .quote-panel{background:#f8f5ec;border-radius:25px;padding:25px;min-height:280px;display:flex;flex-direction:column;justify-content:space-between}
+    .quote-panel .kicker{font-size:12px;text-transform:uppercase;letter-spacing:.14em;font-weight:800;color:#6e7168}
+    .quote-panel blockquote{font-family:"Manrope";font-weight:700;font-size:clamp(25px,3.4vw,38px);line-height:1.13;letter-spacing:-.04em;margin:16px 0}
+    .quote-panel footer{font-size:13px;color:#777a70;display:flex;justify-content:space-between;align-items:center}
+    .quote-nav{display:flex;gap:8px}
+    .quote-btn{border:1px solid var(--line);background:white;width:36px;height:36px;border-radius:50%;cursor:pointer}
+    .section{padding:82px 0}
+    .section-head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:30px}
+    .section-head h2{font-family:"Manrope";font-size:clamp(34px,5vw,56px);letter-spacing:-.055em;line-height:1;margin:0}
+    .section-head p{max-width:520px;color:var(--muted);line-height:1.6;margin:0}
+    .path-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .path{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;min-height:200px;display:flex;flex-direction:column;justify-content:space-between;transition:.2s}
+    .path:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+    .path .num{font-size:12px;font-weight:800;color:#83867c}
+    .path h3{font-family:"Manrope";font-size:22px;letter-spacing:-.03em;margin:24px 0 10px}
+    .path p{font-size:14px;color:var(--muted);line-height:1.5;margin:0}
+    .arrow{font-size:22px;margin-top:18px}
+    .feature{background:var(--ink);color:white;border-radius:38px;padding:46px;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;overflow:hidden;position:relative}
+    .feature:after{content:"";position:absolute;width:420px;height:420px;background:var(--lime);border-radius:50%;filter:blur(90px);opacity:.11;right:-120px;bottom:-160px}
+    .feature .tag{display:inline-flex;padding:8px 12px;border-radius:999px;background:rgba(199,255,74,.12);color:var(--lime);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .feature h2{font-family:"Manrope";font-size:clamp(42px,5.7vw,68px);line-height:.98;letter-spacing:-.06em;margin:20px 0}
+    .feature p{color:#c8cbc1;line-height:1.7;max-width:650px}
+    .feature-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+    .pill{border:1px solid rgba(255,255,255,.16);padding:9px 12px;border-radius:999px;font-size:13px;color:#eef0e8}
+    .feature-side{display:flex;align-items:center;justify-content:center;position:relative;z-index:2}
+    .ticket{background:var(--lime);color:var(--ink);width:min(380px,100%);border-radius:30px;padding:28px;transform:rotate(2deg);box-shadow:0 25px 60px rgba(0,0,0,.2)}
+    .ticket small{font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .ticket .price{font-family:"Manrope";font-size:72px;letter-spacing:-.07em;font-weight:800;margin:15px 0 0}
+    .ticket p{color:#303326;margin:4px 0 25px}
+    .ticket .btn{width:100%;background:var(--ink);color:white}
+    .products-toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:18px}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{border:1px solid var(--line);background:transparent;padding:9px 12px;border-radius:999px;font-size:13px;cursor:pointer}
+    .chip.active{background:var(--ink);color:white;border-color:var(--ink)}
+    .product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .product{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:.2s}
+    .product:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+    .cover{height:180px;padding:22px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+    .cover:after{content:"";position:absolute;width:150px;height:150px;border:34px solid rgba(16,17,14,.09);border-radius:50%;right:-28px;bottom:-48px}
+    .cover.a{background:#d9ff72}.cover.b{background:#ffd46b}.cover.c{background:#b8d7ff}.cover.d{background:#f0bcff}.cover.e{background:#cae4d1}.cover.f{background:#f6bea8}
+    .cover .mini{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.13em}
+    .cover .big{font-family:"Manrope";font-size:28px;font-weight:800;letter-spacing:-.045em;max-width:230px;line-height:1}
+    .product-body{padding:20px}
+    .status{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#5d6157}
+    .status i{width:7px;height:7px;border-radius:50%;background:#86cf2f}
+    .status.legacy i{background:#a2a59c}
+    .product-body h3{font-family:"Manrope";font-size:21px;letter-spacing:-.03em;margin:12px 0 8px}
+    .product-body p{font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 16px}
+    .product-body button{border:none;background:none;padding:0;font-weight:800;cursor:pointer}
+    .knowledge{background:var(--paper2)}
+    .searchbar{display:flex;align-items:center;background:white;border:1px solid var(--line);border-radius:999px;padding:6px 7px 6px 16px;max-width:520px;width:100%}
+    .searchbar input{border:none;outline:none;background:transparent;flex:1;padding:8px;font-size:14px;min-width:0}
+    .searchbar button{border:none;background:var(--ink);color:white;border-radius:999px;padding:10px 15px;font-weight:700;cursor:pointer}
+    .knowledge-grid{display:grid;grid-template-columns:1.1fr .9fr .9fr;gap:16px}
+    .kcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between}
+    .kcard.featured{background:var(--ink);color:white;min-height:330px}
+    .kcard .type{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#83877d}
+    .kcard.featured .type{color:var(--lime)}
+    .kcard h3{font-family:"Manrope";font-size:24px;line-height:1.15;letter-spacing:-.035em;margin:16px 0}
+    .kcard.featured h3{font-size:38px}
+    .kcard p{color:var(--muted);line-height:1.55;font-size:14px}
+    .kcard.featured p{color:#b9bdb3}
+    .kcard .meta{font-size:12px;color:#8a8d84}
+    .dashboard-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:28px;align-items:center}
+    .dashboard-copy h2{font-family:"Manrope";font-size:clamp(38px,5vw,58px);line-height:1;letter-spacing:-.055em;margin:0 0 18px}
+    .dashboard-copy p{color:var(--muted);line-height:1.65}
+    .ticks{display:grid;gap:11px;margin:24px 0}
+    .tick{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+    .tick b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--lime);font-size:12px;flex:none}
+    .mock{background:#151713;border-radius:30px;padding:18px;color:white;box-shadow:var(--shadow)}
+    .mock-top{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 16px}
+    .mock-dots{display:flex;gap:6px}.mock-dots i{width:8px;height:8px;border-radius:50%;background:#4a4d45}
+    .mock-body{display:grid;grid-template-columns:150px 1fr;gap:12px}
+    .sidebar{background:#20221e;border-radius:18px;padding:14px}
+    .side-item{font-size:12px;color:#9da098;padding:10px;border-radius:10px;margin-bottom:4px}
+    .side-item.active{background:var(--lime);color:var(--ink);font-weight:800}
+    .mainpanel{background:#f8f5ec;color:var(--ink);border-radius:18px;padding:18px}
+    .mainpanel h4{font-family:"Manrope";margin:0 0 14px;font-size:20px}
+    .course-row{background:white;border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;display:flex;gap:12px;align-items:center}
+    .thumb{width:54px;height:54px;border-radius:12px;background:var(--lime);display:grid;place-items:center;font-weight:800;font-size:11px}
+    .course-row strong{font-size:13px}.course-row span{display:block;color:#85887e;font-size:11px;margin-top:5px}
+    .progress{height:5px;background:#ebece6;border-radius:99px;margin-top:7px;overflow:hidden}
+    .progress i{display:block;height:100%;background:var(--ink);width:64%}
+    .affiliate{background:var(--ink);color:white;border-radius:36px;padding:44px}
+    .affiliate-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+    .affiliate h2{font-family:"Manrope";font-size:clamp(38px,5vw,58px);letter-spacing:-.055em;line-height:1;margin:0 0 18px}
+    .affiliate p{color:#bdc0b7;line-height:1.6}
+    .statcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .stat{background:#22241f;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:18px}
+    .stat span{font-size:11px;color:#969a90;text-transform:uppercase;letter-spacing:.1em}
+    .stat strong{display:block;font-family:"Manrope";font-size:32px;margin-top:8px}
+    .stat.lime{background:var(--lime);color:var(--ink)}.stat.lime span{color:#4d513e}
+    .community-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+    .community-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+    .community-card.big{background:#d9ff72}
+    .community-card h3{font-family:"Manrope";font-size:30px;letter-spacing:-.04em;margin:12px 0}
+    .community-card p{color:#5d6157;line-height:1.6}
+    .socials{display:grid;gap:10px}
+    .social{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:white;border-radius:17px;padding:16px 17px}
+    .social strong{font-size:14px}.social span{color:var(--muted);font-size:13px}
+    .cta-box{background:var(--lime);border-radius:40px;padding:54px;text-align:center}
+    .cta-box h2{font-family:"Manrope";font-size:clamp(42px,6vw,72px);line-height:.95;letter-spacing:-.06em;margin:0 auto 20px;max-width:830px}
+    .cta-box p{max-width:650px;margin:0 auto 26px;line-height:1.6;color:#4a4e3e}
+    footer.site{padding:45px 0 80px}
+    .footer-grid{border-top:1px solid var(--line);padding-top:28px;display:flex;justify-content:space-between;gap:20px;color:#777a70;font-size:13px}
+    .prototype-badge{position:fixed;right:16px;bottom:16px;z-index:50;background:white;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.12);border-radius:999px;padding:9px 12px;font-size:11px;font-weight:800}
+    .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:white;border-radius:999px;padding:12px 18px;font-size:13px;transition:.25s;z-index:80}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:900px){
+      .navlinks{display:none}.hero-grid,.feature,.dashboard-grid,.affiliate-grid,.community-grid{grid-template-columns:1fr}
+      .hero{padding-top:54px}.hero-card{max-width:610px}.path-grid{grid-template-columns:1fr 1fr}
+      .product-grid{grid-template-columns:1fr 1fr}.knowledge-grid{grid-template-columns:1fr 1fr}.kcard.featured{grid-column:1/-1}
+      .mock-body{grid-template-columns:1fr}.sidebar{display:none}
+    }
+    @media(max-width:620px){
+      .wrap{width:min(100% - 24px,1180px)}.announcement{font-size:11px}
+      nav{height:66px}.brand{font-size:19px}.brandmark{width:31px;height:31px}.navcta{padding:10px 13px;font-size:12px}
+      .hero{padding-top:38px}h1{font-size:52px}.lead{font-size:16px}.hero-actions .btn{width:100%}
+      .mini-proof{align-items:flex-start}.section{padding:58px 0}.section-head{display:block}.section-head p{margin-top:14px}
+      .path-grid,.product-grid,.knowledge-grid{grid-template-columns:1fr}.path{min-height:170px}
+      .feature{padding:28px 20px;border-radius:28px}.ticket .price{font-size:58px}
+      .products-toolbar{display:block}.chips{margin-bottom:12px}
+      .kcard.featured{grid-column:auto}.kcard.featured h3{font-size:31px}
+      .dashboard-grid{gap:18px}.mock{padding:10px;border-radius:22px}.mainpanel{padding:13px}
+      .affiliate{padding:28px 20px;border-radius:28px}.statcards{grid-template-columns:1fr 1fr}
+      .community-card{padding:22px}.cta-box{padding:42px 20px;border-radius:30px}
+      .footer-grid{display:block}.footer-grid div+div{margin-top:10px}.prototype-badge{right:10px;bottom:10px;font-size:10px}
+    }
+  </style>
+</head>
+<body>
+  <div class="announcement"><b>CONCEPT DEMO</b> — Poknik Hub: satu rumah untuk semua ilmu, produk & komuniti.</div>
+  <header>
+    <div class="wrap">
+      <nav>
+        <a class="brand" href="#top"><span class="brandmark">P</span> POKNIK HUB</a>
+        <div class="navlinks">
+          <a href="#mula">Mula sini</a><a href="#program">Program</a><a href="#ilmu">Ilmu</a><a href="#affiliate">Affiliate</a>
+        </div>
+        <a class="navcta" href="https://bit.ly/kawanthreads" target="_blank" rel="noopener">Join komuniti ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <span class="eyebrow"><i class="dot"></i> Ilmu bisnes yang boleh terus buat</span>
+          <h1>Bukan tambah teori.<br><span class="highlight">Kita buat sampai jadi.</span></h1>
+          <p class="lead">Semua ilmu Poknik, program bimbingan, kelas, video dan komuniti dalam satu tempat. Pilih masalah yang kita nak selesaikan, kemudian ikut laluan yang jelas.</p>
+          <div class="hero-actions">
+            <a class="btn btn-dark" href="#mula">Saya nak mula →</a>
+            <a class="btn btn-light" href="#program">Tengok semua program</a>
+          </div>
+          <div class="mini-proof">
+            <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span><span class="face"></span></div>
+            <span>Dibina sebagai <b>hub pembelajaran & komuniti</b>, bukan sekadar sales page.</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="profile-top">
+            <div class="avatar-placeholder">PN</div>
+            <div><strong>Nik Ahmad Nik Hashim</strong><span>@poknik9697 · Threads</span></div>
+          </div>
+          <div class="quote-panel">
+            <div>
+              <div class="kicker">POKNIK NOTE #<span id="quoteNo">01</span></div>
+              <blockquote id="quoteText">“Teknologi tak ada guna kalau ayat kita salah.”</blockquote>
+            </div>
+            <footer>
+              <span>Ilmu ringkas → tindakan jelas</span>
+              <div class="quote-nav">
+                <button class="quote-btn" onclick="prevQuote()" aria-label="Previous quote">←</button>
+                <button class="quote-btn" onclick="nextQuote()" aria-label="Next quote">→</button>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="mula">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Mula ikut situasi kita.</h2>
+          <p>Tak perlu pening tengok 30 produk. Poknik Hub susun content ikut masalah dan tahap pengguna dahulu, baru bawa kepada produk yang sesuai.</p>
+        </div>
+        <div class="path-grid">
+          <a class="path" href="#program"><span class="num">01 / SIDE INCOME</span><div><h3>Saya baru nak cari income tambahan</h3><p>Mula dengan asas, produk yang senang difahami dan rutin tindakan harian.</p></div><span class="arrow">↗</span></a>
+          <a class="path" href="#program"><span class="num">02 / SALES</span><div><h3>Saya meniaga tapi sales sangkut</h3><p>Audit customer, offer, sales cycle, follow-up dan aliran closing.</p></div><span class="arrow">↗</span></a>
+          <a class="path" href="#ilmu"><span class="num">03 / SKILL</span><div><h3>Saya nak pandai menjual</h3><p>Belajar headline, avatar pelanggan, objection dan komunikasi jualan.</p></div><span class="arrow">↗</span></a>
+          <a class="path" href="#affiliate"><span class="num">04 / SCALE</span><div><h3>Saya nak bina team & sistem</h3><p>Susun agent, affiliate, content, SOP dan sistem yang boleh berkembang.</p></div><span class="arrow">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="program">
+      <div class="wrap">
+        <div class="feature">
+          <div>
+            <span class="tag">Program utama semasa</span>
+            <h2>Bimbingan<br>EastelPoknik</h2>
+            <p>Program bimbingan jangka panjang yang menggunakan projek sebenar sebagai padang latihan. Fokusnya bukan sekadar satu projek, tetapi membina keupayaan peserta untuk menjana pendapatan secara berdikari.</p>
+            <div class="feature-meta"><span class="pill">3 tahun bimbingan</span><span class="pill">Latihan praktikal</span><span class="pill">Komuniti</span><span class="pill">Sistem & skrip</span></div>
+          </div>
+          <div class="feature-side">
+            <div class="ticket">
+              <small>Yuran masuk yang dipaparkan</small>
+              <div class="price">RM39</div>
+              <p>Maklumat program perlu disahkan Poknik sebelum versi rasmi dilancarkan.</p>
+              <button class="btn" onclick="demoToast('Demo: halaman detail + checkout akan dibuka di sini.')">Lihat struktur program →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin-top:70px">
+          <h2>Arkib produk Poknik.</h2>
+          <p>Prototype katalog ini menunjukkan bagaimana produk lama dan semasa boleh disusun semula. Status akhir, harga dan availability akan disahkan dengan Poknik.</p>
+        </div>
+        <div class="products-toolbar">
+          <div class="chips">
+            <button class="chip active" data-filter="all">Semua</button>
+            <button class="chip" data-filter="current">Semasa</button>
+            <button class="chip" data-filter="sales">Sales</button>
+            <button class="chip" data-filter="dropship">Dropship</button>
+            <button class="chip" data-filter="legacy">Arkib</button>
+          </div>
+          <small style="color:var(--muted)">Klik filter untuk demo katalog</small>
+        </div>
+        <div class="product-grid" id="productGrid">
+          <article class="product" data-tags="current">
+            <div class="cover a"><span class="mini">3 YEAR MENTORING</span><span class="big">Bimbingan EastelPoknik</span></div>
+            <div class="product-body"><span class="status"><i></i> Current offer</span><h3>Bimbingan EastelPoknik</h3><p>Bimbingan jangka panjang untuk bina skill menjana pendapatan dan sistem bisnes.</p><button onclick="demoToast('Demo product page: EastelPoknik')">Explore →</button></div>
+          </article>
+          <article class="product" data-tags="dropship sales legacy">
+            <div class="cover b"><span class="mini">100+ VIDEO</span><span class="big">14 Days Dropship</span></div>
+            <div class="product-body"><span class="status legacy"><i></i> Catalogue / verify status</span><h3>14 Days Dropship</h3><p>Modul step-by-step menjual dari zero dengan bimbingan dan model affiliate.</p><button onclick="demoToast('Demo product page: 14 Days Dropship')">Explore →</button></div>
+          </article>
+          <article class="product" data-tags="sales legacy">
+            <div class="cover c"><span class="mini">SALES SYSTEM</span><span class="big">Master Sales Cycle</span></div>
+            <div class="product-body"><span class="status legacy"><i></i> Archive / verify status</span><h3>Master Sales Cycle</h3><p>Framework memahami kedudukan prospek dan tindakan yang relevan dalam funnel.</p><button onclick="demoToast('Demo product page: Master Sales Cycle')">Explore →</button></div>
+          </article>
+          <article class="product" data-tags="dropship legacy">
+            <div class="cover d"><span class="mini">BUSINESS TRACK</span><span class="big">Dropship With Poknik</span></div>
+            <div class="product-body"><span class="status legacy"><i></i> Archive / verify status</span><h3>Dropship With Poknik</h3><p>Laluan membina sales, customer base, ejen dan struktur bisnes yang lebih besar.</p><button onclick="demoToast('Demo product page: Dropship With Poknik')">Explore →</button></div>
+          </article>
+          <article class="product" data-tags="sales legacy">
+            <div class="cover e"><span class="mini">BUSINESS FOUNDATION</span><span class="big">Bimbingan Bersama Poknik</span></div>
+            <div class="product-body"><span class="status legacy"><i></i> Archive / verify status</span><h3>Business Foundation</h3><p>Asas bisnes, pelanggan, produk, mindset, influence dan pertumbuhan.</p><button onclick="demoToast('Demo product page: Business Foundation')">Explore →</button></div>
+          </article>
+          <article class="product" data-tags="legacy sales">
+            <div class="cover f"><span class="mini">FREE KNOWLEDGE</span><span class="big">Poknik Video Library</span></div>
+            <div class="product-body"><span class="status legacy"><i></i> Content library concept</span><h3>100++ Video & Notes</h3><p>Video lama, live, voice note, Threads dan artikel dikumpulkan menjadi library searchable.</p><button onclick="location.href='#ilmu'">Explore →</button></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section knowledge" id="ilmu">
+      <div class="wrap">
+        <div class="section-head">
+          <div><h2>Google untuk ilmu Poknik.</h2><p style="margin-top:14px">Semua Threads, video, artikel dan voice note boleh dicari ikut masalah sebenar pengguna.</p></div>
+          <div class="searchbar"><span>⌕</span><input id="knowledgeSearch" placeholder="Cari: agent, sales, closing, customer..." /><button onclick="searchKnowledge()">Cari</button></div>
+        </div>
+        <div class="knowledge-grid" id="knowledgeGrid">
+          <article class="kcard featured" data-keywords="sales cycle funnel closing whatsapp chatbot website prospek">
+            <div><span class="type">Poknik Note · Sales</span><h3>“Jangan main wasap closing kalau kita tak tahu posisi prospek dalam sales cycle.”</h3><p>Susun mesej ikut tahap prospek. Teknologi hanya mempercepat sistem yang betul, bukan membetulkan ayat yang salah.</p></div><span class="meta">Topic: Sales Cycle · 6 min read</span>
+          </article>
+          <article class="kcard" data-keywords="customer avatar pelanggan marketing headline">
+            <div><span class="type">Lesson · Marketing</span><h3>Customer avatar dulu, iklan kemudian.</h3><p>Kenal siapa yang kita bantu, apa masalah mereka dan bahasa yang mereka guna sebelum buat content.</p></div><span class="meta">Topic: Customer Avatar</span>
+          </article>
+          <article class="kcard" data-keywords="sales 3000 first sale dropship income">
+            <div><span class="type">Video · Foundation</span><h3>Membina RM3,000 sales pertama.</h3><p>Daripada target besar kepada rutin kerja dan aktiviti yang boleh diukur setiap hari.</p></div><span class="meta">Topic: Sales Foundation</span>
+          </article>
+          <article class="kcard" data-keywords="agent affiliate team scale ejen">
+            <div><span class="type">Guide · Team</span><h3>Dari jual sendiri kepada bina ejen.</h3><p>Bezakan proses cari pelanggan dengan proses membina orang lain supaya mereka boleh menjual.</p></div><span class="meta">Topic: Agent System</span>
+          </article>
+          <article class="kcard" data-keywords="headline copywriting content social media threads">
+            <div><span class="type">Worksheet · Content</span><h3>100 headline untuk content & sales.</h3><p>Bank idea yang boleh diubah ikut offer, customer avatar dan tahap prospek.</p></div><span class="meta">Topic: Copywriting</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="dashboard">
+      <div class="wrap dashboard-grid">
+        <div class="dashboard-copy">
+          <span class="eyebrow">SATU AKAUN</span>
+          <h2>Beli sekali. Semua terus masuk dashboard.</h2>
+          <p>Versi production nanti boleh jadi learning portal sebenar. Pengguna login satu kali, sistem tahu produk apa yang mereka beli, lesson mana belum habis dan group mana mereka patut masuk.</p>
+          <div class="ticks">
+            <div class="tick"><b>✓</b><span>Course library & lesson progress</span></div>
+            <div class="tick"><b>✓</b><span>Purchase history & automatic access</span></div>
+            <div class="tick"><b>✓</b><span>Community link ikut program</span></div>
+            <div class="tick"><b>✓</b><span>Download, workbook & recording di satu tempat</span></div>
+          </div>
+          <button class="btn btn-dark" onclick="demoToast('Prototype dashboard — backend akan dibina selepas konsep diluluskan.')">Preview dashboard flow</button>
+        </div>
+        <div class="mock" aria-label="Dashboard concept preview">
+          <div class="mock-top"><strong>poknik / member</strong><div class="mock-dots"><i></i><i></i><i></i></div></div>
+          <div class="mock-body">
+            <div class="sidebar">
+              <div class="side-item active">My Learning</div><div class="side-item">Knowledge Library</div><div class="side-item">Community</div><div class="side-item">Affiliate</div><div class="side-item">Profile</div>
+            </div>
+            <div class="mainpanel">
+              <small>ASSALAMUALAIKUM 👋</small><h4>Sambung belajar</h4>
+              <div class="course-row"><div class="thumb">EP</div><div style="flex:1"><strong>EastelPoknik · Foundation</strong><span>Lesson 8 of 12 · 64%</span><div class="progress"><i></i></div></div></div>
+              <div class="course-row"><div class="thumb" style="background:#ffd46b">14D</div><div style="flex:1"><strong>14 Days Dropship</strong><span>100+ video in library</span><div class="progress"><i style="width:31%"></i></div></div></div>
+              <div class="course-row"><div class="thumb" style="background:#b8d7ff">MSC</div><div style="flex:1"><strong>Sales Cycle Notes</strong><span>Saved to your library</span><div class="progress"><i style="width:88%"></i></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="affiliate">
+      <div class="wrap">
+        <div class="affiliate">
+          <div class="affiliate-grid">
+            <div>
+              <span class="tag" style="background:rgba(199,255,74,.12);color:var(--lime)">AFFILIATE ENGINE</span>
+              <h2>Orang belajar.<br>Orang share.<br>Sistem track.</h2>
+              <p>Setiap member boleh dapat link referral sendiri. Poknik boleh tetapkan komisen ikut produk, lihat conversion, approve payout dan tahu content mana yang menghasilkan jualan.</p>
+              <button class="btn" style="background:var(--lime);color:var(--ink);margin-top:12px" onclick="demoToast('Demo affiliate dashboard')">Lihat affiliate flow →</button>
+            </div>
+            <div class="statcards">
+              <div class="stat lime"><span>Referral link</span><strong>/p/azlan</strong></div>
+              <div class="stat"><span>Clicks</span><strong>1,284</strong></div>
+              <div class="stat"><span>Sales</span><strong>47</strong></div>
+              <div class="stat"><span>Commission</span><strong>RM4.6k</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="komuniti">
+      <div class="wrap">
+        <div class="section-head"><h2>Content jadi komuniti.</h2><p>Threads kekal sebagai top-of-funnel. Poknik Hub menjadi rumahnya. WhatsApp/Telegram menjadi ruang interaksi dan follow-up.</p></div>
+        <div class="community-grid">
+          <div class="community-card big">
+            <span class="eyebrow" style="background:rgba(255,255,255,.45)">WEEKLY BRIEFING</span>
+            <h3>Masuk komuniti Poknik.</h3>
+            <p>Dapat update program, briefing, nota baru dan jemputan kelas terus daripada komuniti Poknik.</p>
+            <a class="btn btn-dark" href="https://bit.ly/kawanthreads" target="_blank" rel="noopener">Join WhatsApp →</a>
+          </div>
+          <div class="community-card">
+            <div class="socials">
+              <a class="social" href="https://www.threads.com/@poknik9697" target="_blank" rel="noopener"><div><strong>Threads</strong><span> · @poknik9697</span></div><b>↗</b></a>
+              <a class="social" href="https://t.me/TWPoknik" target="_blank" rel="noopener"><div><strong>Telegram</strong><span> · Telegram With Poknik</span></div><b>↗</b></a>
+              <button class="social" style="width:100%;cursor:pointer" onclick="demoToast('YouTube / video library akan disambungkan selepas audit asset.')"><div style="text-align:left"><strong>Video Library</strong><span> · coming into Hub</span></div><b>↗</b></button>
+              <button class="social" style="width:100%;cursor:pointer" onclick="demoToast('Email / broadcast automation dalam production roadmap.')"><div style="text-align:left"><strong>Broadcast</strong><span> · email + WhatsApp</span></div><b>↗</b></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="cta-box">
+          <h2>Satu Poknik. Satu hub. Semua jalan masuk sini.</h2>
+          <p>Threads, produk digital, kelas, video, WhatsApp, affiliate dan customer lama tidak lagi berpecah di banyak link. Semua disusun menjadi satu ecosystem yang boleh dibesarkan.</p>
+          <a class="btn btn-dark" href="#top">Explore dari atas ↑</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="wrap footer-grid">
+      <div><b>POKNIK HUB</b> · Concept prototype 2026</div>
+      <div>Maklumat produk/harga adalah berdasarkan sumber awam dan perlu disahkan Poknik sebelum pelancaran rasmi.</div>
+    </div>
+  </footer>
+
+  <div class="prototype-badge">● LIVE CONCEPT PROTOTYPE</div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const quotes = [
+      "“Teknologi tak ada guna kalau ayat kita salah.”",
+      "“Jangan buat kerja tanpa faham kedudukan prospek dalam funnel.”",
+      "“Bina income yang boleh berulang, bukan sekadar satu kali jual.”",
+      "“Projek boleh berubah. Skill yang kita bina kekal.”"
+    ];
+    let q=0;
+    function renderQuote(){
+      document.getElementById('quoteText').textContent=quotes[q];
+      document.getElementById('quoteNo').textContent=String(q+1).padStart(2,'0');
+    }
+    function nextQuote(){q=(q+1)%quotes.length;renderQuote()}
+    function prevQuote(){q=(q-1+quotes.length)%quotes.length;renderQuote()}
+    setInterval(nextQuote,6500);
+
+    document.querySelectorAll('.chip').forEach(btn=>btn.addEventListener('click',()=>{
+      document.querySelectorAll('.chip').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+      const f=btn.dataset.filter;
+      document.querySelectorAll('.product').forEach(p=>p.style.display=(f==='all'||p.dataset.tags.includes(f))?'block':'none');
+    }));
+
+    function searchKnowledge(){
+      const term=document.getElementById('knowledgeSearch').value.toLowerCase().trim();
+      let count=0;
+      document.querySelectorAll('.kcard').forEach(c=>{
+        const hay=(c.dataset.keywords+' '+c.innerText).toLowerCase();
+        const show=!term||hay.includes(term); c.style.display=show?'flex':'none'; if(show) count++;
+      });
+      demoToast(term ? `${count} hasil dijumpai untuk “${term}”` : 'Tunjuk semua ilmu');
+    }
+    document.getElementById('knowledgeSearch').addEventListener('keydown',e=>{if(e.key==='Enter')searchKnowledge()});
+
+    let toastTimer;
+    function demoToast(msg){
+      const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+      clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+    }
+  </script>
+</body>
+</html>
