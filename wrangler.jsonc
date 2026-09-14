@@ -17,8 +17,7 @@
   },
   "d1_databases": [
     {
-      "binding": "DB",
-      "database_name": "poknik-hub-db"
+      "binding": "DB"
     }
   ]
 }
