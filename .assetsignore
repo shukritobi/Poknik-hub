@@ -8,3 +8,7 @@ wrangler.jsonc
 README.md
 node_modules
 node_modules/**
+src
+src/**
+.dev.vars
+.dev.vars.*
