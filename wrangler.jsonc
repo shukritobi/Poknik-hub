@@ -21,5 +21,26 @@
     {
       "binding": "DB"
     }
-  ]
+  ],
+  "env": {
+    "production": {
+      "name": "poknik-hub-live",
+      "workers_dev": true,
+      "preview_urls": false,
+      "vars": {
+        "PAYMENT_ENVIRONMENT": "live",
+        "LIVE_PAYMENTS_ENABLED": "false"
+      },
+      "assets": {
+        "directory": ".",
+        "binding": "ASSETS",
+        "run_worker_first": true
+      },
+      "d1_databases": [
+        {
+          "binding": "DB"
+        }
+      ]
+    }
+  }
 }
