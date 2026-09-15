@@ -53,6 +53,7 @@ function purchaseEnvironment(purchase, env) {
 function paymentMethod(purchase) {
   return purchase?.transaction_data?.payment_method || purchase?.payment?.payment_method || null;
 }
+function isSuccessfulStatus(status) { return ['paid','cleared','settled'].includes(String(status || '')); }
 function sanitizePurchase(purchase) {
   if (!purchase || typeof purchase !== 'object') return null;
   return {
@@ -142,7 +143,6 @@ async function ensureSchema(env) {
         env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC)'),
         env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status)'),
         env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_orders_email ON orders(customer_email)'),
-        env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_orders_environment ON orders(environment)'),
         env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_callback_received_at ON callback_events(received_at DESC)'),
         env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_security_created_at ON security_events(created_at DESC)')
       ]);
@@ -150,6 +150,7 @@ async function ensureSchema(env) {
       await ensureColumn(env, 'orders', 'environment', "TEXT NOT NULL DEFAULT 'test'");
       await ensureColumn(env, 'callback_events', 'environment', "TEXT NOT NULL DEFAULT 'test'");
       await ensureColumn(env, 'callback_events', 'signature_valid', 'INTEGER NOT NULL DEFAULT 1');
+      await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_orders_environment ON orders(environment)').run();
 
       await env.DB.prepare("UPDATE orders SET environment='test' WHERE environment IS NULL OR environment='' ").run();
       await env.DB.prepare("UPDATE callback_events SET environment='test' WHERE environment IS NULL OR environment='' ").run();
@@ -352,7 +353,7 @@ async function applyPurchaseUpdate(env, purchase, eventType = null) {
   const status = purchase.status || 'unknown';
   const method = paymentMethod(purchase);
   const ts = now();
-  const paidAt = status === 'paid' ? (purchase.payment?.paid_on || ts) : null;
+  const paidAt = isSuccessfulStatus(status) ? (purchase.payment?.paid_on || ts) : null;
   const detectedEnv = purchaseEnvironment(purchase, env);
   await env.DB.prepare(`UPDATE orders SET
       chip_status=?, status=?, payment_method=?, updated_at=?, environment=?,
@@ -405,7 +406,7 @@ async function syncOrderWithChip(env, order, source = 'manual.sync') {
       chip_status: purchase.status || order.chip_status,
       payment_method: paymentMethod(purchase) || order.payment_method,
       environment: purchaseEnvironment(purchase, env),
-      paid_at: purchase.status === 'paid' ? (purchase.payment?.paid_on || order.paid_at) : order.paid_at
+      paid_at: isSuccessfulStatus(purchase.status) ? (purchase.payment?.paid_on || order.paid_at) : order.paid_at
     };
   } catch { return order; }
 }
@@ -416,7 +417,7 @@ async function orderStatus(request, env) {
   if (!id || id.length > 64) return json({ error: 'Order ID diperlukan.' }, 400);
   let order = await env.DB.prepare(`SELECT id, chip_purchase_id, product_slug, product_name, amount_sen, currency, status, chip_status, payment_method, created_at, paid_at, environment FROM orders WHERE id=?`).bind(id).first();
   if (!order) return json({ error: 'Order tidak ditemui.' }, 404);
-  if (!['paid','refunded','cancelled','chargeback','settled'].includes(order.status)) order = await syncOrderWithChip(env, order, 'return.verify');
+  if (!['paid','cleared','settled','refunded','cancelled','chargeback'].includes(order.status)) order = await syncOrderWithChip(env, order, 'return.verify');
   return json({ order: { ...order, price: money(order.amount_sen) } });
 }
 
@@ -509,14 +510,14 @@ async function adminSummary(request, env) {
   const where = environment ? 'WHERE environment=?' : '';
   const args = environment ? [environment] : [];
   const row = await env.DB.prepare(`SELECT
-    COALESCE(SUM(CASE WHEN status='paid' THEN amount_sen ELSE 0 END),0) AS revenue_sen,
-    SUM(CASE WHEN status='paid' THEN 1 ELSE 0 END) AS paid_orders,
+    COALESCE(SUM(CASE WHEN status IN ('paid','cleared','settled') THEN amount_sen ELSE 0 END),0) AS revenue_sen,
+    SUM(CASE WHEN status IN ('paid','cleared','settled') THEN 1 ELSE 0 END) AS paid_orders,
     SUM(CASE WHEN status IN ('initiated','created','viewed','pending_execute') THEN 1 ELSE 0 END) AS pending_orders,
     COUNT(*) AS total_orders,
     COUNT(DISTINCT CASE WHEN customer_email IS NOT NULL THEN lower(customer_email) END) AS customers
     FROM orders ${where}`).bind(...args).first();
   const top = await env.DB.prepare(`SELECT product_slug, product_name, COUNT(*) orders, COALESCE(SUM(amount_sen),0) revenue_sen
-    FROM orders ${where ? where + ' AND' : 'WHERE'} status='paid'
+    FROM orders ${where ? where + ' AND' : 'WHERE'} status IN ('paid','cleared','settled')
     GROUP BY product_slug, product_name ORDER BY revenue_sen DESC LIMIT 10`).bind(...args).all();
   return json({ environment: environment || 'all', summary: { ...row, revenue: money(Number(row?.revenue_sen || 0)) }, products: top.results || [] });
 }
@@ -550,8 +551,8 @@ async function adminCustomers(request, env) {
       MAX(customer_name) AS name,
       MAX(customer_phone) AS phone,
       COUNT(*) AS orders,
-      SUM(CASE WHEN status='paid' THEN 1 ELSE 0 END) AS paid_orders,
-      COALESCE(SUM(CASE WHEN status='paid' THEN amount_sen ELSE 0 END),0) AS revenue_sen,
+      SUM(CASE WHEN status IN ('paid','cleared','settled') THEN 1 ELSE 0 END) AS paid_orders,
+      COALESCE(SUM(CASE WHEN status IN ('paid','cleared','settled') THEN amount_sen ELSE 0 END),0) AS revenue_sen,
       MAX(created_at) AS last_order_at,
       environment
     FROM orders ${where.length ? 'WHERE '+where.join(' AND ') : ''}
