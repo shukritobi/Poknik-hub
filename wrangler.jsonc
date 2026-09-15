@@ -7,7 +7,7 @@
     "enabled": true
   },
   "workers_dev": true,
-  "preview_urls": true,
+  "preview_urls": false,
   "vars": {
     "PAYMENT_ENVIRONMENT": "test",
     "LIVE_PAYMENTS_ENABLED": "false"
