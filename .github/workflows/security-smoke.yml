@@ -1,0 +1,109 @@
+name: Security smoke checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Worker JavaScript syntax
+        run: node --check src/worker.js
+
+      - name: Validate Wrangler payment environments
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const cfg = JSON.parse(fs.readFileSync('wrangler.jsonc', 'utf8'));
+          const fail = m => { console.error(m); process.exit(1); };
+          if (cfg.vars?.PAYMENT_ENVIRONMENT !== 'test') fail('Default Worker must remain TEST.');
+          if (String(cfg.vars?.LIVE_PAYMENTS_ENABLED) !== 'false') fail('Default Worker live payments must be false.');
+          const prod = cfg.env?.production;
+          if (!prod) fail('Production Wrangler environment is missing.');
+          if (prod.name !== 'poknik-hub-live') fail('Unexpected production Worker name.');
+          if (prod.vars?.PAYMENT_ENVIRONMENT !== 'live') fail('Production environment must be LIVE-labelled.');
+          if (String(prod.vars?.LIVE_PAYMENTS_ENABLED) !== 'false') fail('Production live payment gate must default to false.');
+          if (!Array.isArray(cfg.d1_databases) || cfg.d1_databases[0]?.binding !== 'DB') fail('Test DB binding missing.');
+          if (!Array.isArray(prod.d1_databases) || prod.d1_databases[0]?.binding !== 'DB') fail('Production DB binding missing.');
+          console.log('Wrangler environment isolation OK');
+          NODE
+
+      - name: Verify payment hardening invariants
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const src = fs.readFileSync('src/worker.js', 'utf8');
+          const required = [
+            "__Host-poknik_admin",
+            "SameSite=Strict",
+            "X-Signature",
+            "public_key/",
+            "LIVE_PAYMENTS_ENABLED",
+            "PAYMENT_ENVIRONMENT",
+            "environment_mismatch",
+            "content-security-policy",
+            "referrer-policy",
+            "checkout.rate_limited",
+            "admin.login.blocked"
+          ];
+          const missing = required.filter(x => !src.includes(x));
+          if (missing.length) {
+            console.error('Missing hardening markers:', missing.join(', '));
+            process.exit(1);
+          }
+          console.log('Payment hardening markers OK');
+          NODE
+
+      - name: Refuse tracked local secret files
+        shell: bash
+        run: |
+          tracked="$(git ls-files)"
+          if printf '%s\n' "$tracked" | grep -E '(^|/)(\.dev\.vars($|\.)|\.env$|\.env\.)' | grep -v '\.env\.example$'; then
+            echo 'A local secret/environment file is tracked by Git.'
+            exit 1
+          fi
+          echo 'No local secret files tracked'
+
+      - name: Check forbidden secret assignments in source
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, sys
+          patterns = [
+              re.compile(r'CHIP_SECRET_KEY\s*[:=]\s*["\'][^"\']+["\']'),
+              re.compile(r'ADMIN_SESSION_SECRET\s*[:=]\s*["\'][^"\']+["\']'),
+              re.compile(r'ADMIN_PASSWORD\s*[:=]\s*["\'][^"\']+["\']'),
+          ]
+          allowed = {'PRODUCTION-LAUNCH.md', 'SECURITY-HARDENING.md'}
+          problems = []
+          for p in Path('.').rglob('*'):
+              if not p.is_file() or '.git' in p.parts or p.name in allowed:
+                  continue
+              if p.suffix.lower() not in {'.js','.json','.jsonc','.html','.css','.md','.yml','.yaml','.txt'}:
+                  continue
+              text = p.read_text(errors='ignore')
+              for pattern in patterns:
+                  for m in pattern.finditer(text):
+                      # env.CHIP_SECRET_KEY etc. are references, not assignments of literal values.
+                      if 'env.' in text[max(0,m.start()-8):m.start()+2]:
+                          continue
+                      problems.append(f'{p}: {m.group(0)[:80]}')
+          if problems:
+              print('Potential literal secrets found:')
+              print('\n'.join(problems))
+              sys.exit(1)
+          print('No obvious literal payment/admin secrets found')
+          PY
