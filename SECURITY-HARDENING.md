@@ -9,6 +9,17 @@ The default Worker configuration is deliberately locked to **test**:
 - CHIP provider responses are checked using `Purchase.is_test`
 - if the configured environment and CHIP environment do not match, the checkout is stopped and the Purchase is cancelled where possible
 - existing orders created before environment tracking are treated as test orders
+- the current RM78 / two PPBM payments are test records only
+
+A separate named Wrangler environment now exists for production:
+
+- environment: `production`
+- Worker name: `poknik-hub-live`
+- `PAYMENT_ENVIRONMENT = "live"`
+- `LIVE_PAYMENTS_ENABLED = "false"` by default
+- separate `DB` binding, intended to auto-provision a separate production D1 database on first production deployment
+
+This means the existing test Worker and its test D1 do not need to be converted into the live system.
 
 ## Implemented controls
 
@@ -23,6 +34,7 @@ The default Worker configuration is deliberately locked to **test**:
 - Full CHIP callback payloads are not retained. Only operational event metadata is stored.
 - Test and live orders are marked separately.
 - Live payment activation has a second explicit gate using `LIVE_PAYMENTS_ENABLED`.
+- A test/live mismatch detected from CHIP prevents checkout from continuing.
 
 ### Admin security
 
@@ -34,6 +46,7 @@ The default Worker configuration is deliberately locked to **test**:
 - Login failure/block events are recorded using a salted request fingerprint, not the raw IP address.
 - State-changing admin requests must be same-origin.
 - Admin pages are sent with `no-store` and `noindex` headers.
+- The admin dashboard separates test/live reporting and exposes webhook/security logs.
 
 ### Public endpoint hardening
 
@@ -44,23 +57,57 @@ The default Worker configuration is deliberately locked to **test**:
 - Security headers are added to site/API responses, including HSTS, CSP, frame denial, nosniff, Referrer-Policy and Permissions-Policy.
 - Public Worker preview URLs are disabled.
 
+## Production separation
+
+The production configuration is now defined in `wrangler.jsonc` as a named environment. Deploy it with:
+
+```bash
+npx wrangler deploy --env production
+```
+
+Do not use the default/test CHIP secrets for the production environment. Cloudflare/Wrangler environment secrets must be set separately.
+
+See `PRODUCTION-LAUNCH.md` for the exact launch checklist.
+
 ## Before switching to live payments
 
 1. Keep the current D1 database as test history.
-2. Create a separate production D1 database, recommended name: `poknik-hub-prod-db`.
-3. Bind the production Worker to the production D1 database before taking real payments.
-4. Replace CHIP test Secret Key and Brand ID with live credentials.
-5. Change `PAYMENT_ENVIRONMENT` to `live`.
-6. Change `LIVE_PAYMENTS_ENABLED` to `true` only after a final configuration review.
-7. Run one low-value real transaction and confirm:
-   - payment appears in CHIP
-   - signed callback appears in Webhook Logs
-   - order is marked live and paid in dashboard
-   - customer and product totals are correct
-8. Once `poknik.my` is attached and stable, consider disabling the public `workers.dev` route.
+2. Deploy `poknik-hub-live` with its own production D1 database.
+3. Set production-only CHIP live Secret Key and live Brand ID.
+4. Use a new long random `ADMIN_SESSION_SECRET` in production.
+5. Put `/admin/*` and `/api/admin/*` behind Cloudflare Access.
+6. Attach `poknik.my` to the live Worker.
+7. Keep `LIVE_PAYMENTS_ENABLED=false` until the final review.
+8. Confirm the production dashboard starts at RM0 / zero real orders.
+9. Run the final controlled real payment only after all checks pass.
+10. Once `poknik.my` is stable, disable the public `workers.dev` route for the live Worker if possible.
 
-## Recommended additional perimeter protection
+## Cloudflare Access
 
-Put `/admin/*` and `/api/admin/*` behind **Cloudflare Access** with an allow rule restricted to the owner's Cloudflare account or approved email address. Keep the in-app password/session layer as defense in depth.
+Protect `/admin/*` and `/api/admin/*` with an allow rule restricted to approved owner/admin email addresses. Keep the in-app password/session layer as defense in depth.
 
 Do not place `/api/chip/callback` behind Cloudflare Access because CHIP must be able to reach it.
+
+## Key handling
+
+### Test Worker secrets
+
+- `CHIP_SECRET_KEY`: CHIP test API key
+- `CHIP_BRAND_ID`: CHIP test Brand ID
+- `ADMIN_PASSWORD`: strong admin password
+- `ADMIN_SESSION_SECRET`: randomly generated cryptographic value, preferably at least 32 random bytes
+
+### Production Worker secrets
+
+Create completely separate production values. In particular, generate a dedicated CHIP live API key specifically for Poknik Hub rather than reusing another integration key.
+
+Never place secrets in:
+
+- GitHub source
+- `wrangler.jsonc` vars
+- frontend JavaScript
+- HTML
+- screenshots
+- chat/WhatsApp messages
+
+The CHIP verification public key is not a secret and is fetched server-side from CHIP when needed.
