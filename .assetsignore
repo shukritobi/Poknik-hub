@@ -8,9 +8,13 @@ wrangler.jsonc
 .assetsignore
 .gitignore
 README.md
+SECURITY-HARDENING.md
+PRODUCTION-LAUNCH.md
 node_modules
 node_modules/**
 src
 src/**
 .dev.vars
 .dev.vars.*
+.env
+.env.*
